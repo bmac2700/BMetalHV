@@ -1,0 +1,1 @@
+cargo build --target "src/arch/x86_64/target.json"
