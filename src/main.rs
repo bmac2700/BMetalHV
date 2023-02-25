@@ -15,8 +15,7 @@ fn panic(_info: &PanicInfo) -> ! {
 
 static HELLO: &[u8] = b"Hello World!";
 
-#[no_mangle] // don't mangle the name of this function
-pub extern "C" fn kernel_entry() -> ! {
+fn kernel_entry() -> ! {
     // this function is the entry point, since the linker looks for a function
     // named `_start` by default
     let vga_buffer = 0xb8000 as *mut u8;

@@ -9,13 +9,27 @@ SECTIONS {
         *(.multiboot_header)
     }
 
-    .text :
+    .text : ALIGN(4K)
     {
-        KEEP(*(.text._start))
-        *(.text._start_arguments) /* Constants (or statics in Rust speak) read by _start(). */
-        *(.text._start_rust)      /* The Rust entry point */
-        *(.text*)                 /* Everything else */
+        *(.text*)
     }
 
+    /* Read-only data. */
+	.rodata : ALIGN(4K)
+	{
+		*(.rodata)
+	}
+ 
+	/* Read-write data (initialized) */
+	.data : ALIGN(4K)
+	{
+		*(.data)
+	}
 
+    /* Read-write data (uninitialized) and stack */
+    .bss : ALIGN(4K)
+	{
+		*(COMMON)
+		*(.bss)
+	}
 }
