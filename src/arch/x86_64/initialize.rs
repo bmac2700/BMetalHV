@@ -1,4 +1,6 @@
 pub fn initialize() -> Result<(), ()> {
+    super::exceptions::initialize_exceptions()?;
+
     static HELLO: &[u8] = b"Hello World!";
     let vga_buffer = 0xb8000 as *mut u8;
 

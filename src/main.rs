@@ -1,4 +1,7 @@
 // src/main.rs
+#![feature(const_mut_refs)]
+#![feature(const_trait_impl)]
+
 #![no_std] // don't link the Rust standard library
 #![no_main] // disable all Rust-level entry points
 
