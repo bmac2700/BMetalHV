@@ -10,5 +10,7 @@ panic = "abort"
 
 [profile.release]
 panic = "abort"
+lto = true
+strip = true
 
 [dependencies]
