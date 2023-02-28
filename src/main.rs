@@ -4,6 +4,7 @@
 #![no_main] // disable all Rust-level entry points
 
 mod arch;
+mod drivers;
 
 use core::panic::PanicInfo;
 
