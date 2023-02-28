@@ -58,6 +58,14 @@ impl InterruptDescriptorTable {
     }
 }
 
+const INTERRUPT_DIVISION_BY_ZERO: u8 = 0;
+const INTERRUPT_DEBUG_EXCEPTION: u8 = 1;
+const INTERRUPT_NMI: u8 = 2;
+const INTERRUPT_BREAKPOINT: u8 = 3;
+const INTERRUPT_INTO: u8 = 4;
+const INTERRUPT_OUT_OF_BOUNDS: u8 = 5;
+const INTERRUPT_INVALID_OPCODE: u8 = 6;
+
 static mut INTERRUPT_DESCRIPTOR_TABLE: InterruptDescriptorTable = InterruptDescriptorTable::new();
 
 pub fn initialize_exceptions() -> Result<(), ()> {
