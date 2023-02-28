@@ -14,3 +14,4 @@ lto = true
 strip = true
 
 [dependencies]
+bitfield = "0.14.0"
