@@ -1,5 +1,7 @@
 // src/main.rs
-#![feature(abi_x86_interrupt)]
+#![cfg_attr(all(feature = "arch_x86_64"),
+    feature(abi_x86_interrupt)
+)]
 #![feature(const_mut_refs)]
 #![feature(const_trait_impl)]
 #![no_std] // don't link the Rust standard library
