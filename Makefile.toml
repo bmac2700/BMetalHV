@@ -14,5 +14,5 @@ script = [
  "echo \"set timeout=0\nset default=0\n\nmenuentry \"BMetalHV\" { \n\tmultiboot2 /boot/baremetal_hypervisor \n\tboot \n}\" > iso/boot/grub/grub.cfg",
  "cp baremetal_hypervisor iso/boot",
  "grub-mkrescue -o os.iso iso",
- "qemu-system-x86_64 -machine q35 -cdrom os.iso -d cpu_reset"
+ "qemu-system-x86_64 -machine q35 -cdrom os.iso -d int"
 ]
