@@ -74,10 +74,10 @@ static mut INTERRUPT_DESCRIPTOR_TABLE: IDT = IDT::new();
 mod double_fault;
 
 pub fn initialize_exceptions() -> Result<(), ()> {
-    
     unsafe {
         //Double fault
-        INTERRUPT_DESCRIPTOR_TABLE.interrupts[8].set_handler(double_fault::double_fault_handler as u64);
+        INTERRUPT_DESCRIPTOR_TABLE.interrupts[8]
+            .set_handler(double_fault::double_fault_handler as u64);
     }
 
     unsafe { INTERRUPT_DESCRIPTOR_TABLE.load() };

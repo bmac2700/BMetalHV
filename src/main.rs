@@ -21,5 +21,7 @@ extern "C" fn kernel_entry() -> ! {
     if arch::initialize().is_err() {}
     if bsp::initialize().is_err() {}
 
-    loop {}
+    loop {
+        unsafe { core::arch::asm!("int 3") }
+    }
 }
