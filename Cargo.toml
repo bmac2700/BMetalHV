@@ -13,5 +13,11 @@ panic = "abort"
 lto = true
 strip = true
 
+[features]
+default = []
+bsp_generic = []
+
+arch_x86_64 = []
+
 [dependencies]
 bitfield = "0.14.0"

@@ -4,7 +4,7 @@ args = ["clean"]
 
 [tasks.build_x86-64]
 command = "cargo"
-args = ["build", "--target", "src/bsp/generic_x86_64/x86_64.json"]
+args = ["build", "--target", "src/bsp/generic_x86_64/x86_64.json", "--features", "arch_x86_64,bsp_generic"]
 
 [tasks.qemu_x86-64]
 dependencies = ["build_x86-64"]
