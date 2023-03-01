@@ -1,74 +1,97 @@
 //https://wiki.osdev.org/Interrupt_Descriptor_Table
 
-#[derive(Clone, Copy)]
-pub struct InterruptTableEntryOptions(u16);
-
-impl InterruptTableEntryOptions {
-
-    #[inline]
-    const fn minimal() -> Self {
-        InterruptTableEntryOptions(0b00000001_11000000)
-    }
-
-}
-
-#[derive(Clone, Copy)]
-#[repr(C)]
-pub struct InterruptTableEntry {
-    isr_low: u16,
-    kernel_cs: u16, //GDT Segment
-    options: InterruptTableEntryOptions,
-    isr_mid: u16,
-    isr_high: u32,
+#[repr(C, packed)]
+#[derive(Copy, Clone)]
+pub struct IDTEntry {
+    base_low: u16,
+    segment_selector: u16,
+    ist: u8,
+    attributes: u8,
+    base_mid: u16,
+    base_high: u32,
     reserved: u32,
 }
 
-impl InterruptTableEntry {
-    #[inline]
+impl IDTEntry {
     const fn default() -> Self {
         Self {
-            kernel_cs: 0,
-            isr_low: 0,
-            isr_mid: 0,
-            isr_high: 0,
-            options: InterruptTableEntryOptions::minimal(),
-            reserved: 0
+            base_low: 0,
+            segment_selector: 0,
+            ist: 0,
+            attributes: 0b0000_1110,
+            base_mid: 0,
+            base_high: 0,
+            reserved: 0,
         }
+    }
+
+    fn set_handler(&mut self, address: u64) {
+        self.segment_selector = 0x8;
+        self.base_low = address as u16;
+        self.base_mid = (address >> 16) as u16;
+        self.base_high = (address >> 32) as u32;
+
+        self.attributes |= 0b1000_0000
     }
 }
 
-#[repr(C)]
-pub struct InterruptDescriptorTable {
-    interrupts: [InterruptTableEntry; 256],
+#[repr(C, packed)]
+pub struct IDT {
+    pub interrupts: [IDTEntry; 256],
 }
 
-impl InterruptDescriptorTable {
-    #[inline]
+impl IDT {
     const fn new() -> Self {
         Self {
-            interrupts: [InterruptTableEntry::default(); 256],
-        }
-    }
-
-    #[inline]
-    pub fn load(&'static self) {
-        unsafe {
-            core::arch::asm!("lidt [{}]", in(reg) self, options(readonly, nostack, preserves_flags));  
+            interrupts: [IDTEntry::default(); 256],
         }
     }
 }
 
-const INTERRUPT_DIVISION_BY_ZERO: u8 = 0;
-const INTERRUPT_DEBUG_EXCEPTION: u8 = 1;
-const INTERRUPT_NMI: u8 = 2;
-const INTERRUPT_BREAKPOINT: u8 = 3;
-const INTERRUPT_INTO: u8 = 4;
-const INTERRUPT_OUT_OF_BOUNDS: u8 = 5;
-const INTERRUPT_INVALID_OPCODE: u8 = 6;
+impl IDT {
+    fn pointer(&self) -> IDTPointer {
+        use core::mem::size_of;
+        IDTPointer {
+            base: self as *const _ as u64,
+            limit: (size_of::<Self>() - 1) as u16,
+        }
+    }
+    pub fn load(&'static self) {
+        unsafe {
+            core::arch::asm!("lidt [{}]", in(reg) &self.pointer(), options(readonly, nostack, preserves_flags));
+        }
+    }
+}
 
-static mut INTERRUPT_DESCRIPTOR_TABLE: InterruptDescriptorTable = InterruptDescriptorTable::new();
+#[repr(C, packed)]
+pub struct IDTPointer {
+    limit: u16,
+    base: u64,
+}
+
+static mut INTERRUPT_DESCRIPTOR_TABLE: IDT = IDT::new();
+
+extern "x86-interrupt" fn double_fault_handler(
+    stack_frame: *const u8, _error_code: u64) -> !
+{
+    static MESSAGE: &[u8] = b"EXCEPTION: DOUBLE FAULT";
+    let vga_buffer = 0xb8000 as *mut u8;
+
+    for (i, &byte) in MESSAGE.iter().enumerate() {
+        unsafe {
+            *vga_buffer.offset(i as isize * 2) = byte;
+            *vga_buffer.offset(i as isize * 2 + 1) = 0x4;
+        }
+    }
+    loop {}
+}
 
 pub fn initialize_exceptions() -> Result<(), ()> {
-    unsafe {INTERRUPT_DESCRIPTOR_TABLE.load()}
+    unsafe {
+        //Double fault
+        INTERRUPT_DESCRIPTOR_TABLE.interrupts[8].set_handler(double_fault_handler as u64);
+    }
+    unsafe { INTERRUPT_DESCRIPTOR_TABLE.load() };
+    unsafe { core::arch::asm!("sti") };
     Ok(())
 }

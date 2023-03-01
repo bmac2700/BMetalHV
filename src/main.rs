@@ -1,7 +1,7 @@
 // src/main.rs
+#![feature(abi_x86_interrupt)]
 #![feature(const_mut_refs)]
 #![feature(const_trait_impl)]
-
 #![no_std] // don't link the Rust standard library
 #![no_main] // disable all Rust-level entry points
 
