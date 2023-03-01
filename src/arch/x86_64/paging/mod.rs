@@ -3,6 +3,5 @@ pub fn initialize_paging() -> Result<(), ()> {
 
     unsafe { core::arch::asm!("mov {cr3}, cr3", cr3 = inout(reg) cr3) };
 
-    
     Ok(())
 }

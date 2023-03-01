@@ -1,6 +1,6 @@
 mod boot;
 
 mod exceptions;
-mod paging;
 mod initialize;
+mod paging;
 pub use initialize::initialize;

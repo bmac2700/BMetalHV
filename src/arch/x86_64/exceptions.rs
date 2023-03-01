@@ -71,9 +71,7 @@ pub struct IDTPointer {
 
 static mut INTERRUPT_DESCRIPTOR_TABLE: IDT = IDT::new();
 
-extern "x86-interrupt" fn double_fault_handler(
-    stack_frame: *const u8, _error_code: u64) -> !
-{
+extern "x86-interrupt" fn double_fault_handler(stack_frame: *const u8, _error_code: u64) -> ! {
     static MESSAGE: &[u8] = b"EXCEPTION: DOUBLE FAULT";
     let vga_buffer = 0xb8000 as *mut u8;
 
